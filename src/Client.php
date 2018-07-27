@@ -121,13 +121,12 @@ class Client
     /**
      * Create a Transmission\Client.
      *
-     * @param null $hostname
-     * @param null $port
-     * @param null $username
-     * @param null $password
+     * @param null|string $hostname
+     * @param null|string $port
+     * @param null|string $username
+     * @param null|string $password
      *
      * @return Client
-     *
      */
     public static function create($hostname = null, $port = null, $username = null, $password = null): self
     {
