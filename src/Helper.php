@@ -57,23 +57,6 @@ class Helper
         }
 
         switch ($type) {
-            case 'int':
-            case 'integer':
-                return (int)$value;
-            case 'real':
-            case 'float':
-            case 'double':
-                return (float)$value;
-            case 'string':
-                return (string)$value;
-            case 'bool':
-            case 'boolean':
-                return (bool)$value;
-            case 'object':
-                return (new static)->fromJson($value, true);
-            case 'array':
-            case 'json':
-                return (new static)->fromJson($value);
             case 'collection':
                 return collect(is_array($value) ? $value : (new static)->fromJson($value));
             case 'date':
@@ -82,10 +65,8 @@ class Helper
                 return (new static)->asDateTime($value);
             case 'bytes':
                 return static::formatBytes($value);
-                break;
             default:
                 return $value;
-                break;
         }
     }
 
