@@ -16,7 +16,9 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
     public function boot()
     {
         if ($this->app instanceof LaravelApplication && $this->app->runningInConsole()) {
-            $this->publishes([__DIR__ . '/config/transmission.php' => config_path('transmission.php')]);
+            $this->publishes([
+                __DIR__ . '/config/transmission.php' => config_path('transmission.php'),
+            ]);
         } elseif ($this->app instanceof LumenApplication) {
             $this->app->configure('transmission');
         }

@@ -6,6 +6,9 @@ use Transmission\Client;
 
 /**
  * Torrent
+ *
+ * @method mixed getHaveValid(bool $castingEnabled = false) Get Have Valid Value.
+ * @method mixed getHaveUnchecked(bool $castingEnabled = false) Get Have Unchecked Value.
  */
 class Torrent extends AbstractModel
 {
@@ -299,31 +302,23 @@ class Torrent extends AbstractModel
         switch ($this->get('status')) {
             case static::STATUS_STOPPED:
                 return $this->get('isFinished', false) ? 'Seeding complete' : 'Paused';
-                break;
             case static::STATUS_CHECK_WAIT:
                 return 'Queued for verification';
-                break;
             case static::STATUS_CHECK:
                 return 'Verifying local data';
-                break;
             case static::STATUS_DOWNLOAD_WAIT:
                 return 'Queued for download';
-                break;
             case static::STATUS_DOWNLOAD:
                 return 'Downloading';
-                break;
             case static::STATUS_SEED_WAIT:
                 return 'Queued for seeding';
-                break;
             case static::STATUS_SEED:
                 return 'Seeding';
-                break;
             case null:
                 return 'Unknown';
-                break;
             default:
                 return 'Error';
-                break;
+
         }
     }
 
@@ -339,13 +334,10 @@ class Torrent extends AbstractModel
         switch ($this->get('seedRatioMode')) {
             case static::RATIO_USE_GLOBAL:
                 return $client->seedRatioLimit();
-                break;
             case static::RATIO_USE_LOCAL:
                 return $this->get('seedRatioLimit');
-                break;
             default:
                 return -1;
-                break;
         }
     }
 
@@ -360,16 +352,12 @@ class Torrent extends AbstractModel
         switch ($this->get('error')) {
             case static::ERROR_TRACKER_WARNING:
                 return 'Tracker returned a warning: ' . $str;
-                break;
             case static::ERROR_TRACKER_ERROR:
                 return 'Tracker returned an error: ' . $str;
-                break;
             case static::ERROR_LOCAL_ERROR:
                 return 'Error: ' . $str;
-                break;
             default:
                 return null;
-                break;
         }
     }
 }
