@@ -65,15 +65,19 @@ class NetworkException extends \Exception
      *
      * @return static
      */
-    public static function createByCode(int $statusCode, string $message = null)
+    public static function createByCode(int $statusCode, string $message = null): self
     {
-        $errorMessage = static::$statusCodes[$statusCode];
+        $errorMessage = null;
+        if (isset(static::$statusCodes[$statusCode])) {
+            $errorMessage = static::$statusCodes[$statusCode];
 
-        if (filled($message)) {
-            $message = '- ' . $message;
+            if (filled($message)) {
+                $errorMessage = $errorMessage . ' - ' . $message;
+            }
         }
 
-        $message = sprintf('%d: %s %s', $statusCode, $errorMessage, $message);
+
+        $message = sprintf('%d: %s', $statusCode, $errorMessage ?? $message);
 
         return new static($message, $statusCode);
     }
