@@ -2,12 +2,13 @@
 
 namespace Transmission\HttpClient\Plugin;
 
-use Transmission\Exception\NetworkException;
-use Transmission\Exception\RuntimeException;
-use Transmission\HttpClient\Message\ResponseMediator;
 use Http\Client\Common\Plugin;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Transmission\Exception\NetworkException;
+use Transmission\Exception\RuntimeException;
+use Transmission\Exception\TransmissionException;
+use Transmission\HttpClient\Message\ResponseMediator;
 
 /**
  * A plugin to throw exception based on response status code.
@@ -20,14 +21,15 @@ class ExceptionThrower implements Plugin
     public function handleRequest(RequestInterface $request, callable $next, callable $first)
     {
         return $next($request)->then(function (ResponseInterface $response) {
-            if (!ResponseMediator::isConflictError($response) && ResponseMediator::isError($response)) {
-                $content = ResponseMediator::getContent($response);
+            $statusCode = $response->getStatusCode();
+            $content = ResponseMediator::getContent($response);
 
-                if (is_array($content) && isset($content['result'])) {
-                    throw new RuntimeException($content['result'], $response->getStatusCode());
+            if (ResponseMediator::isSuccess($response)) {
+                if (is_array($content) && isset($content['result']) && 'success' !== $content['result']) {
+                    throw new TransmissionException($content['result'], $statusCode);
                 }
-
-                switch ($response->getStatusCode()) {
+            } elseif (!ResponseMediator::isConflictError($response) && ResponseMediator::isError($response)) {
+                switch ($statusCode) {
                     case 401:
                         $message = 'Invalid Username/Password';
                         break;
@@ -35,11 +37,11 @@ class ExceptionThrower implements Plugin
                         $message = 'Your IP Address is Not Whitelisted';
                         break;
                     default:
-                        $message = $content;
+                        $message = is_array($content) ? $content['result'] : $content;
                         break;
                 }
 
-                throw NetworkException::createByCode($response->getStatusCode(), $message);
+                throw NetworkException::createByCode($statusCode, $message);
             }
 
             return $response;
