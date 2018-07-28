@@ -18,6 +18,7 @@ use Transmission\HttpClient\Message\ResponseMediator;
 use Transmission\HttpClient\Plugin\AuthSession;
 use Transmission\HttpClient\Plugin\ExceptionThrower;
 use Transmission\HttpClient\Plugin\History;
+use Transmission\Models\Torrent;
 
 /**
  * Transmission-RPC API SDK Client
@@ -29,21 +30,21 @@ class Client
      *
      * @var string
      */
-    const VERSION = '1.0.0';
+    const VERSION = '1.1.0';
 
     /**
      * Transmission-RPC Hostname
      *
      * @var string
      */
-    public $hostname = '127.0.0.1';
+    public $hostname;
 
     /**
      * Transmission-RPC Port
      *
      * @var string
      */
-    public $port = 9091;
+    public $port;
 
     /**
      * Transmission-RPC Path
@@ -63,30 +64,6 @@ class Client
     private $httpClientBuilder;
 
     /**
-     * Default Torrent Fields to Fetch
-     *
-     * @var array
-     */
-    public $defaultFields = [
-        'id',
-        'eta',
-        'name',
-        'status',
-        'isFinished',
-        'rateUpload',
-        'rateDownload',
-        'percentDone',
-        'files',
-        'haveValid',
-        'totalSize',
-        'sizeWhenDone',
-        'startDate',
-        'doneDate',
-        'hashString',
-        'downloadDir',
-    ];
-
-    /**
      * Instantiate a new Transmission Client.
      *
      * @param null|string  $hostname
@@ -96,14 +73,14 @@ class Client
      * @param Builder|null $httpClientBuilder
      */
     public function __construct(
-        $hostname = null,
-        $port = null,
-        $username = null,
-        $password = null,
+        string $hostname = null,
+        int $port = null,
+        string $username = null,
+        string $password = null,
         Builder $httpClientBuilder = null
     ) {
-        $this->hostname = $hostname ?? getenv('TRANSMISSION_HOSTNAME');
-        $this->port = $port ?? getenv('TRANSMISSION_PORT');
+        $this->hostname = $hostname ?? env('TRANSMISSION_HOSTNAME', '127.0.0.1');
+        $this->port = $port ?? env('TRANSMISSION_PORT', 9091);
 
         $this->responseHistory = new History();
         $this->httpClientBuilder = $httpClientBuilder ?? new Builder();
@@ -112,6 +89,9 @@ class Client
         $this->httpClientBuilder->addPlugin(new HeaderDefaultsPlugin([
             'User-Agent' => $this->defaultUserAgent(),
         ]));
+
+        $username = $username ?? env('TRANSMISSION_USERNAME');
+        $password = $password ?? env('TRANSMISSION_PASSWORD', '');
 
         if (filled($username)) {
             $this->authenticate($username, $password);
@@ -122,14 +102,18 @@ class Client
      * Create a Transmission\Client.
      *
      * @param null|string $hostname
-     * @param null|string $port
+     * @param null|int    $port
      * @param null|string $username
      * @param null|string $password
      *
      * @return Client
      */
-    public static function create($hostname = null, $port = null, $username = null, $password = null): self
-    {
+    public static function create(
+        string $hostname = null,
+        int $port = null,
+        string $username = null,
+        string $password = null
+    ): self {
         $client = new static($hostname, $port, $username, $password);
 
         return $client;
@@ -138,15 +122,34 @@ class Client
     /**
      * Create a Transmission\Client using an HttpClient.
      *
-     * @param HttpClient $httpClient
+     * @param HttpClient  $httpClient
+     * @param null|string $hostname
+     * @param null|int    $port
+     * @param null|string $username
+     * @param null|string $password
      *
      * @return Client
      */
-    public static function createWithHttpClient(HttpClient $httpClient): self
-    {
+    public static function createWithHttpClient(
+        HttpClient $httpClient,
+        string $hostname = null,
+        int $port = null,
+        string $username = null,
+        string $password = null
+    ): self {
         $builder = new Builder($httpClient);
 
-        return new static($builder);
+        return new static($hostname, $port, $username, $password, $builder);
+    }
+
+    /**
+     * Get Client Instance.
+     *
+     * @return Client
+     */
+    public function instance(): self
+    {
+        return $this;
     }
 
     /**
@@ -157,7 +160,7 @@ class Client
      *
      * @return Client
      */
-    public function authenticate($username, $password = ''): self
+    public function authenticate(string $username, string $password = ''): self
     {
         $authentication = new BasicAuth($username, $password);
 
@@ -170,11 +173,11 @@ class Client
     /**
      * Set Session ID.
      *
-     * @param $sessionId
+     * @param string $sessionId
      *
      * @return Client
      */
-    public function setSessionId($sessionId): self
+    public function setSessionId(string $sessionId): self
     {
         $this->httpClientBuilder->removePlugin(AuthSession::class);
         $this->httpClientBuilder->addPlugin(new AuthSession($sessionId));
@@ -273,7 +276,7 @@ class Client
      *
      * @return bool
      */
-    public function set($ids, $arguments): bool
+    public function set($ids, array $arguments): bool
     {
         $arguments['ids'] = $ids;
         $this->api('torrent-set', $arguments);
@@ -294,7 +297,7 @@ class Client
      */
     public function get($ids = null, array $fields = null): Collection
     {
-        $fields = $fields ?? $this->defaultFields;
+        $fields = $fields ?? Torrent::$fields['default'];
         $data = $this->api('torrent-get', compact('ids', 'fields'));
 
         $torrentsInfo = data_get($data, 'arguments.torrents', 0);
@@ -303,7 +306,7 @@ class Client
             return collect();
         }
 
-        $torrents = collect($torrentsInfo)->mapInto(Collection::class);
+        $torrents = collect($torrentsInfo)->mapInto(Torrent::class);
 
         return $torrents->count() > 1 ? $torrents : $torrents->first();
     }
@@ -320,8 +323,12 @@ class Client
      *
      * @return Collection
      */
-    public function add($torrent, $metainfo = false, $savepath = null, $arguments = []): Collection
-    {
+    public function add(
+        string $torrent,
+        bool $metainfo = false,
+        string $savepath = null,
+        array $arguments = []
+    ): Collection {
         $arguments[$metainfo ? 'metainfo' : 'filename'] = $metainfo ? base64_encode($torrent) : $torrent;
 
         if ($savepath !== null) {
@@ -351,7 +358,7 @@ class Client
      *
      * @return bool
      */
-    public function remove($ids, $deleteLocalData = false): bool
+    public function remove($ids, bool $deleteLocalData = false): bool
     {
         $arguments = ['ids' => $ids, 'delete-local-data' => $deleteLocalData];
         $this->api('torrent-remove', $arguments);
@@ -370,7 +377,7 @@ class Client
      *
      * @return bool
      */
-    public function move($ids, $location, $move = true): bool
+    public function move($ids, string $location, bool $move = true): bool
     {
         $this->api('torrent-set-location', compact('ids', 'location', 'move'));
 
@@ -388,7 +395,7 @@ class Client
      *
      * @return array
      */
-    public function rename($ids, $path, $name): array
+    public function rename($ids, string $path, string $name): array
     {
         return $this->api('torrent-rename-path', compact('ids', 'path', 'name'));
     }
@@ -548,13 +555,13 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs "free-space" for arguments.
      *
-     * @param string $path Path to check free space (default: download-dir).
+     * @param null|string $path Path to check free space (default: download-dir).
      *
      * @return array
      */
-    public function freeSpace($path = null): array
+    public function freeSpace(string $path = null): array
     {
-        if (!$path) {
+        if (blank($path)) {
             $path = $this->getSettings()['arguments']['download-dir'];
         }
 
@@ -584,7 +591,7 @@ class Client
      *
      * @return bool
      */
-    public function updateDownloadDir($downloadDir): bool
+    public function updateDownloadDir(string $downloadDir): bool
     {
         $settings = [
             'download-dir' => $downloadDir,
@@ -667,7 +674,7 @@ class Client
      *
      * @return string
      */
-    protected function transmissionUrl()
+    protected function transmissionUrl(): string
     {
         return $this->hostname . ':' . $this->port . $this->path;
     }
