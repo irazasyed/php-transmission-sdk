@@ -562,6 +562,22 @@ class Client
     }
 
     /**
+     * Seed Ratio Limit.
+     *
+     * @return mixed
+     */
+    public function seedRatioLimit()
+    {
+        $settings = $this->getSettings(['seedRatioLimited', 'seedRatioLimit'])['arguments'];
+
+        if (isset($settings['seedRatioLimited'])) {
+            return $settings['seedRatioLimit'];
+        }
+
+        return -1;
+    }
+
+    /**
      * Update Download Dir.
      *
      * @param string $downloadDir Path to download torrents.
