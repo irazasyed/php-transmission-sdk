@@ -2,10 +2,9 @@
 
 namespace Transmission\Laravel;
 
-use Transmission\Client;
-
-use Laravel\Lumen\Application as LumenApplication;
 use Illuminate\Foundation\Application as LaravelApplication;
+use Laravel\Lumen\Application as LumenApplication;
+use Transmission\Client;
 
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
@@ -32,7 +31,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/config/transmission.php', 'transmission');
 
-        $this->app->singleton('transmission', function ($app) {
+        $this->app->singleton('transmission', function () {
             return new Client(
                 config('transmission.hostname'),
                 config('transmission.port'),
