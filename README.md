@@ -76,7 +76,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [ico-code-quality]: https://img.shields.io/scrutinizer/g/irazasyed/php-transmission-sdk.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/irazasyed/php-transmission-sdk.svg?style=flat-square
 
-[sdk-usage]: https://user-images.githubusercontent.com/1915268/43349562-51460ce4-921e-11e8-8bb8-264801c19927.jpg
+[sdk-usage]: https://user-images.githubusercontent.com/1915268/43361217-ffeb2b62-92e6-11e8-8362-51d740593712.png
 
 [link-repo]: https://github.com/irazasyed/php-transmission-sdk
 [link-packagist]: https://packagist.org/packages/irazasyed/php-transmission-sdk
