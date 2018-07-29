@@ -285,6 +285,18 @@ class Client
     }
 
     /**
+     * Get All Torrents.
+     *
+     * @param array|null $fields
+     *
+     * @return Collection
+     */
+    public function getAll(array $fields = null): Collection
+    {
+        return $this->get(null, $fields);
+    }
+
+    /**
      * Get information on torrents, if the ids parameter is
      * null all torrents will be returned.
      *
