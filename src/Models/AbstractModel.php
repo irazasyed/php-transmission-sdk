@@ -3,7 +3,7 @@
 namespace Transmission\Models;
 
 use Illuminate\Support\Collection;
-use Transmission\Helper;
+use Transmission\Formatter;
 
 /**
  * AbstractModel
@@ -80,7 +80,7 @@ class AbstractModel extends Collection
     protected function castAttribute(string $key, $value, bool $castingEnabled = false)
     {
         if ($castingEnabled && array_key_exists($key, $this->casts)) {
-            return Helper::castAttribute($this->casts[$key], $value);
+            return Formatter::castAttribute($this->casts[$key], $value);
         }
 
         return $value;

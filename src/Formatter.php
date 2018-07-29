@@ -6,14 +6,15 @@ use Carbon\CarbonInterval;
 use Illuminate\Support\Carbon;
 
 /**
- * Helper
+ * Formatter
  */
-class Helper
+class Formatter
 {
     /** Used by formatBytes() modes */
     const UNITS_MODE_DECIMAL = 0;
     const UNITS_MODE_BINARY = 1;
-    const UNITS_MODE_DATA = 2;
+    /** Speed */
+    const SPEED_KBPS = 1000;
 
     /**
      * Formats bytes into a human readable string if $format is true, otherwise return $bytes as is.
@@ -35,10 +36,6 @@ class Helper
                 $base = 1024;
                 $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
                 break;
-            case static::UNITS_MODE_DATA: // Data-rate units
-                $base = 1000;
-                $units = ['B/s', 'kB/s', 'MB/s', 'GB/s', 'TB/s', 'PB/s', 'EB/s', 'ZB/s', 'YB/s'];
-                break;
             default: // Decimal (Disk space)
                 $base = 1000;
                 $units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
@@ -53,6 +50,73 @@ class Helper
         }
 
         return round($bytes, 2) . ' ' . $units[$i];
+    }
+
+    /**
+     * Speed Bps.
+     *
+     * @param $Bps
+     *
+     * @return string
+     */
+    public static function speedBps($Bps)
+    {
+        return static::speed(static::bpsToKBps($Bps));
+    }
+
+    /**
+     * Bps to KBps.
+     *
+     * @param $Bps
+     *
+     * @return float
+     */
+    public static function bpsToKBps($Bps)
+    {
+        return floor($Bps / static::SPEED_KBPS);
+    }
+
+    /**
+     * Format KBps to Data-rate units.
+     *
+     * @param $KBps
+     *
+     * @return string
+     */
+    public static function speed($KBps)
+    {
+        $speed = $KBps;
+
+        if ($speed <= 999.95) { // 0 KBps to 999 K
+            return static::trunicateNumber($speed, 0) . ' KB/s';
+        }
+
+        $speed /= static::SPEED_KBPS;
+
+        if ($speed <= 99.995) { // 1 M to 99.99 M
+            return static::trunicateNumber($speed, 2) . ' MB/s';
+        }
+        if ($speed <= 999.95) { // 100 M to 999.9 M
+            return static::trunicateNumber($speed, 1) . ' MB/s';
+        }
+
+        // insane speeds
+        $speed /= static::SPEED_KBPS;
+
+        return static::trunicateNumber($speed, 2) . ' GB/s';
+    }
+
+    /**
+     * Trunicate a number to the given decimal points.
+     *
+     * @param string $number
+     * @param int    $decimals
+     *
+     * @return string
+     */
+    public static function trunicateNumber($number, int $decimals = 2)
+    {
+        return bcdiv($number, 1, $decimals);
     }
 
     /**
@@ -85,7 +149,7 @@ class Helper
             case 'memory':
                 return static::formatBytes($value, true, static::UNITS_MODE_BINARY);
             case 'datarate':
-                return static::formatBytes($value, true, static::UNITS_MODE_DATA);
+                return static::speedBps($value);
             default:
                 return $value;
         }
