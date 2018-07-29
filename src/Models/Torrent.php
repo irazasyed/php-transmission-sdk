@@ -7,6 +7,7 @@ use Transmission\Client;
 /**
  * Torrent
  *
+ * @method mixed getLeftUntilDone(bool $castingEnabled = false) Get Left Until Done Value.
  * @method mixed getHaveValid(bool $castingEnabled = false) Get Have Valid Value.
  * @method mixed getHaveUnchecked(bool $castingEnabled = false) Get Have Unchecked Value.
  */
@@ -277,7 +278,7 @@ class Torrent extends AbstractModel
      */
     public function isDone(): bool
     {
-        return $this->get('leftUntilDone', 0) < 1;
+        return $this->getLeftUntilDone(false) < 1;
     }
 
     /**
