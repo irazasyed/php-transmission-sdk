@@ -143,12 +143,15 @@ class Torrent extends AbstractModel
         'activityDate'  => 'datetime',
         'addedDate'     => 'datetime',
         'dateCreated'   => 'datetime',
-        'haveValid'     => 'bytes',
-        'haveUnchecked' => 'bytes',
-        'totalDone'     => 'bytes', // Custom
-        'leftUntilDone' => 'bytes',
-        'totalSize'     => 'bytes',
-        'sizeWhenDone'  => 'bytes',
+        'eta'           => 'interval',
+        'haveValid'     => 'size',
+        'haveUnchecked' => 'size',
+        'totalDone'     => 'size', // Custom
+        'leftUntilDone' => 'size',
+        'totalSize'     => 'size',
+        'sizeWhenDone'  => 'size',
+        'rateDownload'  => 'datarate',
+        'rateUpload'    => 'datarate',
     ];
 
     /**

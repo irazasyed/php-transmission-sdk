@@ -2,6 +2,7 @@
 
 namespace Transmission;
 
+use Carbon\CarbonInterval;
 use Illuminate\Support\Carbon;
 
 /**
@@ -9,27 +10,39 @@ use Illuminate\Support\Carbon;
  */
 class Helper
 {
+    /** Used by formatBytes() modes */
+    const UNITS_MODE_DECIMAL = 0;
+    const UNITS_MODE_BINARY = 1;
+    const UNITS_MODE_DATA = 2;
+
     /**
-     * Format Bytes.
+     * Formats bytes into a human readable string if $format is true, otherwise return $bytes as is.
      *
      * @param int  $bytes
-     * @param bool $format     Should we suffix symbol? Default: true.
-     * @param bool $binaryMode Should we calculate in binary mode? Default: false.
+     * @param bool $format Should we suffix symbol? Default: true.
+     * @param int  $mode   Should we calculate in binary/speed mode? Default: decimal.
      *
      * @return string
      */
-    public static function formatBytes(int $bytes, bool $format = true, bool $binaryMode = false): string
+    public static function formatBytes(int $bytes, bool $format = true, int $mode = 0): string
     {
         if (!$format) {
             return $bytes;
         }
 
-        if ($binaryMode) {
-            $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
-            $base = 1024; // Binary
-        } else {
-            $units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-            $base = 1000; // Decimal
+        switch ($mode) {
+            case static::UNITS_MODE_BINARY: // Binary (Used with memory size formating)
+                $base = 1024;
+                $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+                break;
+            case static::UNITS_MODE_DATA: // Data-rate units
+                $base = 1000;
+                $units = ['B/s', 'kB/s', 'MB/s', 'GB/s', 'TB/s', 'PB/s', 'EB/s', 'ZB/s', 'YB/s'];
+                break;
+            default: // Decimal (Disk space)
+                $base = 1000;
+                $units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+                break;
         }
 
         $i = 0;
@@ -59,12 +72,20 @@ class Helper
         switch ($type) {
             case 'collection':
                 return collect(is_array($value) ? $value : (new static)->fromJson($value));
+            case 'interval':
+                return $value < 1 ? -1 : CarbonInterval::seconds($value)->cascade();
             case 'date':
                 return (new static)->asDate($value);
             case 'datetime':
                 return (new static)->asDateTime($value);
-            case 'bytes':
+            case 'timestamp':
+                return (new static)->asTimestamp($value);
+            case 'size':
                 return static::formatBytes($value);
+            case 'memory':
+                return static::formatBytes($value, true, static::UNITS_MODE_BINARY);
+            case 'datarate':
+                return static::formatBytes($value, true, static::UNITS_MODE_DATA);
             default:
                 return $value;
         }
@@ -131,5 +152,17 @@ class Helper
         }
 
         return $value;
+    }
+
+    /**
+     * Return a timestamp as unix timestamp.
+     *
+     * @param  mixed $value
+     *
+     * @return int
+     */
+    protected function asTimestamp($value)
+    {
+        return $this->asDateTime($value)->getTimestamp();
     }
 }
