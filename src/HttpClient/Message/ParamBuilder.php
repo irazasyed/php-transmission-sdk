@@ -21,10 +21,27 @@ final class ParamBuilder
                 return blank($value);
             })->transform(function ($value, $key) {
                 if ('ids' === $key) {
-                    return array_wrap($value);
+                    return static::wrap($value);
                 }
 
                 return $value;
             })->toArray();
+    }
+
+    /**
+     * If the given value is not an array and not null, wrap it in one.
+     * And typehint all values to integer. Primarily used for ids.
+     *
+     * @param $value
+     *
+     * @return array
+     */
+    protected static function wrap($value)
+    {
+        if (is_null($value)) {
+            return [];
+        }
+
+        return !is_array($value) ? [(int)$value] : array_map('intval', $value);
     }
 }
