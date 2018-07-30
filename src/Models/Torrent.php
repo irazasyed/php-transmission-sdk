@@ -7,6 +7,7 @@ use Transmission\Client;
 /**
  * Torrent
  *
+ * @method mixed getUploadRatio(bool $castingEnabled = false) Get Upload Ratio Value.
  * @method mixed getLeftUntilDone(bool $castingEnabled = false) Get Left Until Done Value.
  * @method mixed getHaveValid(bool $castingEnabled = false) Get Have Valid Value.
  * @method mixed getHaveUnchecked(bool $castingEnabled = false) Get Have Unchecked Value.
@@ -150,6 +151,7 @@ class Torrent extends AbstractModel
         'leftUntilDone' => 'size',
         'totalSize'     => 'size',
         'sizeWhenDone'  => 'size',
+        'uploadedEver'  => 'size',
         'rateDownload'  => 'datarate',
         'rateUpload'    => 'datarate',
     ];
@@ -189,6 +191,34 @@ class Torrent extends AbstractModel
     }
 
     /**
+     * Get Metadata Percent Complete.
+     *
+     * @param bool $format
+     *
+     * @return int
+     */
+    public function getMetadataPercentComplete($format = false): int
+    {
+        $percent = $this->get('metadataPercentComplete', 0);
+
+        return $format ? $percent * 100 : $percent;
+    }
+
+    /**
+     * Get Recheck Progress Percent.
+     *
+     * @param bool $format
+     *
+     * @return int
+     */
+    public function getRecheckProgress($format = false): int
+    {
+        $percent = $this->get('recheckProgress', 0);
+
+        return $format ? $percent * 100 : $percent;
+    }
+
+    /**
      * Get Total Done.
      *
      * @param null|bool $castingEnabled
@@ -200,6 +230,30 @@ class Torrent extends AbstractModel
         $value = $this->getHaveValid(false) + $this->getHaveUnchecked(false);
 
         return $this->castAttribute('totalDone', $value, $castingEnabled ?? $this->castingEnabled);
+    }
+
+    /**
+     * Get Upload Speed.
+     *
+     * @param null|bool $castingEnabled
+     *
+     * @return mixed
+     */
+    public function getUploadSpeed($castingEnabled = null)
+    {
+        return $this->get('rateUpload', 0, $castingEnabled);
+    }
+
+    /**
+     * Get Download Speed.
+     *
+     * @param null|bool $castingEnabled
+     *
+     * @return mixed
+     */
+    public function getDownloadSpeed($castingEnabled = null)
+    {
+        return $this->get('rateDownload', 0, $castingEnabled);
     }
 
     /**
@@ -297,6 +351,16 @@ class Torrent extends AbstractModel
     }
 
     /**
+     * Check if meta data needs to be complete.
+     *
+     * @return bool
+     */
+    public function needsMetaData(): bool
+    {
+        return $this->getMetadataPercentComplete() < 1;
+    }
+
+    /**
      * Get Status String.
      *
      * @return string
@@ -329,15 +393,18 @@ class Torrent extends AbstractModel
     /**
      * Get Seed Ratio Limit.
      *
-     * @param Client $client
+     * @param int|Client $globalSeedRatioLimit Provide the global seed ratio limit if you already have cached. This is
+     *                                         to prevent fetching on every request when looping through multiple
+     *                                         torrents as it'll be very slow doing so. It's recommended to cache it
+     *                                         once and pass to this method, otherwise provide Client instance.
      *
      * @return int|string
      */
-    public function seedRatioLimit(Client $client)
+    public function seedRatioLimit($globalSeedRatioLimit)
     {
         switch ($this->get('seedRatioMode')) {
             case static::RATIO_USE_GLOBAL:
-                return $client->seedRatioLimit();
+                return ($globalSeedRatioLimit instanceof Client) ? $globalSeedRatioLimit->seedRatioLimit() : $globalSeedRatioLimit;
             case static::RATIO_USE_LOCAL:
                 return $this->get('seedRatioLimit');
             default:
