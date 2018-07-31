@@ -320,7 +320,7 @@ class Client
 
         $torrents = collect($torrentsInfo)->mapInto(Torrent::class);
 
-        return $torrents->count() > 1 ? $torrents : $torrents->first();
+        return $torrents;
     }
 
     /**
