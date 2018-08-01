@@ -324,14 +324,42 @@ class Client
     }
 
     /**
+     * Add a Torrent File to the download queue.
+     *
+     * @param string      $file         Torrent File Content.
+     * @param string|null $savepath     Path to download the torrent to.
+     * @param array       $optionalArgs Other optional arguments.
+     *
+     * @return Collection
+     */
+    public function addFile($file, string $savepath = null, array $optionalArgs = [])
+    {
+        return $this->add($file, true, $savepath, $optionalArgs);
+    }
+
+    /**
+     * Add a Torrent by URL to the download queue.
+     *
+     * @param string      $url          Magnet URI/URL of the torrent file.
+     * @param string|null $savepath     Path to download the torrent to.
+     * @param array       $optionalArgs Other optional arguments.
+     *
+     * @return Collection
+     */
+    public function addUrl($url, string $savepath = null, array $optionalArgs = [])
+    {
+        return $this->add($url, false, $savepath, $optionalArgs);
+    }
+
+    /**
      * Add a torrent to the download queue
      *
      * @see https://git.io/transmission-rpc-specs "torrent-add" for available arguments.
      *
-     * @param  string  $torrent   Filename/URL of the .torrent file OR Magnet URI/.torrent content.
-     * @param  boolean $metainfo  Is given torrent a metainfo? (default: false).
-     * @param  string  $savepath  Path to download the torrent to.
-     * @param  array   $arguments Other optional arguments.
+     * @param  string  $torrent      Magnet URI/URL of the torrent file OR .torrent content.
+     * @param  boolean $metainfo     Is given torrent a metainfo? (default: false).
+     * @param  string  $savepath     Path to download the torrent to.
+     * @param  array   $optionalArgs Other optional arguments.
      *
      * @return Collection
      */
@@ -339,18 +367,20 @@ class Client
         string $torrent,
         bool $metainfo = false,
         string $savepath = null,
-        array $arguments = []
+        array $optionalArgs = []
     ): Collection {
+        $arguments = [];
+        $arguments['paused'] = false; // To start immediately
         $arguments[$metainfo ? 'metainfo' : 'filename'] = $metainfo ? base64_encode($torrent) : $torrent;
 
         if ($savepath !== null) {
             $arguments['download-dir'] = (string)$savepath;
         }
 
-        $data = $this->api('torrent-add', $arguments);
+        $data = $this->api('torrent-add', array_merge($arguments, $optionalArgs));
 
         if (array_key_exists('torrent-duplicate', $data['arguments'])) {
-            return $this->get($data['arguments']['torrent-duplicate']['id']);
+            return collect($data['arguments']['torrent-duplicate']);
         }
 
         if (!array_key_exists('torrent-added', $data['arguments'])) {
