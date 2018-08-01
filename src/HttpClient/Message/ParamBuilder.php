@@ -21,7 +21,13 @@ final class ParamBuilder
                 return blank($value);
             })->transform(function ($value, $key) {
                 if ('ids' === $key) {
-                    return static::wrap($value);
+                    return $value !== 'recently-active' ? static::wrap($value) : $value;
+                }
+
+                if (is_string($value)) { // Encode if it's not UTF-8
+                    if (mb_detect_encoding($value, 'auto') !== 'UTF-8') {
+                        return mb_convert_encoding($value, 'UTF-8');
+                    }
                 }
 
                 return $value;
