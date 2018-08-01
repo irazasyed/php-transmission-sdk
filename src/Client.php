@@ -186,6 +186,18 @@ class Client
     }
 
     /**
+     * Start All Torrents.
+     *
+     * @see start()
+     *
+     * @return bool
+     */
+    public function startAll(): bool
+    {
+        return $this->start();
+    }
+
+    /**
      * Start one or more torrents.
      *
      * @see https://git.io/transmission-rpc-specs Torrent Action Requests.
@@ -216,6 +228,18 @@ class Client
         $this->api('torrent-start-now', compact('ids'));
 
         return true;
+    }
+
+    /**
+     * Stop All Torrents.
+     *
+     * @see stop()
+     *
+     * @return bool
+     */
+    public function stopAll()
+    {
+        return $this->stop();
     }
 
     /**
