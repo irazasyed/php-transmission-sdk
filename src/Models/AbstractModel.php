@@ -28,12 +28,13 @@ class AbstractModel extends Collection
 
     /**
      * {@inheritdoc}
+     * @param null|bool $castingEnabled
      */
-    public function get($key, $default = null)
+    public function get($key, $default = null, $castingEnabled = null)
     {
         $value = parent::get($key, $default);
 
-        return $this->castAttribute($key, $value, $this->castingEnabled);
+        return $this->castAttribute($key, $value, $castingEnabled ?? $this->castingEnabled);
     }
 
     /**
