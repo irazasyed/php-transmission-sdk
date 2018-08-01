@@ -36,6 +36,9 @@ php artisan vendor:publish --provider="Transmission\Laravel\ServiceProvider"
 ``` php
 $transmission = new Transmission\Client($hostname, $port, $username, $password, $httpClientBuilder = null);
 $transmission->get(); // Get All Torrents.
+
+// Laravel
+$transfers = Transmission::get('recently-active'); //
 ```
 
 > The SDK supports all the methods listed in specs. For more details, check out [transmission-rpc specs](https://git.io/transmission-rpc-specs).
@@ -76,7 +79,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [ico-code-quality]: https://img.shields.io/scrutinizer/g/irazasyed/php-transmission-sdk.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/irazasyed/php-transmission-sdk.svg?style=flat-square
 
-[sdk-usage]: https://user-images.githubusercontent.com/1915268/43361217-ffeb2b62-92e6-11e8-8362-51d740593712.png
+[sdk-usage]: https://user-images.githubusercontent.com/1915268/43494955-0c47765e-9553-11e8-851e-14139d8bcd0d.png
 
 [link-repo]: https://github.com/irazasyed/php-transmission-sdk
 [link-packagist]: https://packagist.org/packages/irazasyed/php-transmission-sdk
