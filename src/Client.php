@@ -11,6 +11,7 @@ use Http\Message\Authentication\BasicAuth;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
 use Transmission\Exception\InvalidArgumentException;
+use Transmission\Exception\NetworkException;
 use Transmission\Exception\TransmissionException;
 use Transmission\HttpClient\Builder;
 use Transmission\HttpClient\Message\ParamBuilder;
@@ -698,13 +699,17 @@ class Client
 
         $body = json_encode(compact('method', 'arguments'));
 
-        $response = $this->getHttpClient()
-            ->post(
-                $this->transmissionUrl(),
-                ['Content-Type' => 'application/json'],
-                $body
-            );
-
+        try {
+            $response = $this->getHttpClient()
+                ->post(
+                    $this->transmissionUrl(),
+                    ['Content-Type' => 'application/json'],
+                    $body
+                );
+        } catch (\Http\Client\Exception\NetworkException $e) {
+            throw new NetworkException($e->getMessage(), $e->getCode());
+        }
+        
         if (ResponseMediator::isConflictError($response)) {
             $this->findAndSetSessionId($response);
 
