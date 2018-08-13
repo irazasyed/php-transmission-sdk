@@ -2,6 +2,18 @@
 
 All notable changes will be documented in this file.
 
+## 1.3.0 - 2018-08-14
+
+### Added
+
+- Add `duplicate` key to `add()` method to indicate the responded transfer info is of a duplicate torrent.
+- Torrent Model: `isFolder()` and `isMagnet()` methods.
+- Param Builder: Add more typecasting to param builder.
+
+### Changed
+
+- Catch Network Exception and rethrow with our own network exception.
+
 ## 1.2.0 - 2018-08-01
 
 ### Added
