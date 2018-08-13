@@ -405,6 +405,8 @@ class Client
         $data = $this->api('torrent-add', array_merge($arguments, $optionalArgs));
 
         if (array_key_exists('torrent-duplicate', $data['arguments'])) {
+            $data['arguments']['torrent-duplicate']['duplicate'] = true;
+
             return collect($data['arguments']['torrent-duplicate']);
         }
 
@@ -692,6 +694,9 @@ class Client
      * @param array  $params
      *
      * @return mixed
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     protected function api(string $method, array $params = [])
     {
@@ -709,7 +714,7 @@ class Client
         } catch (\Http\Client\Exception\NetworkException $e) {
             throw new NetworkException($e->getMessage(), $e->getCode());
         }
-        
+
         if (ResponseMediator::isConflictError($response)) {
             $this->findAndSetSessionId($response);
 
