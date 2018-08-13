@@ -19,14 +19,14 @@ class Torrent extends AbstractModel
      *
      * Field: status
      */
-    const STATUS_STOPPED = 0;
-    const STATUS_CHECK_WAIT = 1;
-    const STATUS_CHECK = 2;
-    const STATUS_DOWNLOAD_WAIT = 3;
-    const STATUS_DOWNLOAD = 4;
-    const STATUS_SEED_WAIT = 5;
-    const STATUS_SEED = 6;
-    const STATUS_ISOLATED = 7;
+    const STATUS_STOPPED = 0; /* Torrent is stopped */
+    const STATUS_CHECK_WAIT = 1; /* Queued to check files */
+    const STATUS_CHECK = 2; /* Checking files */
+    const STATUS_DOWNLOAD_WAIT = 3; /* Queued to download */
+    const STATUS_DOWNLOAD = 4; /* Downloading */
+    const STATUS_SEED_WAIT = 5; /* Queued to seed */
+    const STATUS_SEED = 6; /* Seeding */
+    const STATUS_ISOLATED = 7; /* Isolated */
 
     /**
      * Seed Ratio Modes.
@@ -42,9 +42,13 @@ class Torrent extends AbstractModel
      *
      * Field: error
      */
+    /* everything's fine */
     const ERROR_NONE = 0;
+    /* when we anounced to the tracker, we got a warning in the response */
     const ERROR_TRACKER_WARNING = 1;
+    /* when we anounced to the tracker, we got an error in the response */
     const ERROR_TRACKER_ERROR = 2;
+    /* local trouble, such as disk full or permissions error */
     const ERROR_LOCAL_ERROR = 3;
 
     /**
@@ -358,6 +362,26 @@ class Torrent extends AbstractModel
     public function needsMetaData(): bool
     {
         return $this->getMetadataPercentComplete() < 1;
+    }
+
+    /**
+     * Determine it's a magnet.
+     *
+     * @return bool
+     */
+    public function isMagnet(): bool
+    {
+        return $this->needsMetaData();
+    }
+
+    /**
+     * Determine it's a multi-file folder.
+     *
+     * @return bool
+     */
+    public function isFolder(): bool
+    {
+        return $this->getFileCount() > 1;
     }
 
     /**
