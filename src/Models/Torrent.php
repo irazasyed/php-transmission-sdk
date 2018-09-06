@@ -19,23 +19,23 @@ class Torrent extends AbstractModel
      *
      * Field: status
      */
-    const STATUS_STOPPED = 0; /* Torrent is stopped */
-    const STATUS_CHECK_WAIT = 1; /* Queued to check files */
-    const STATUS_CHECK = 2; /* Checking files */
-    const STATUS_DOWNLOAD_WAIT = 3; /* Queued to download */
-    const STATUS_DOWNLOAD = 4; /* Downloading */
-    const STATUS_SEED_WAIT = 5; /* Queued to seed */
-    const STATUS_SEED = 6; /* Seeding */
-    const STATUS_ISOLATED = 7; /* Isolated */
+    public const STATUS_STOPPED = 0; /* Torrent is stopped */
+    public const STATUS_CHECK_WAIT = 1; /* Queued to check files */
+    public const STATUS_CHECK = 2; /* Checking files */
+    public const STATUS_DOWNLOAD_WAIT = 3; /* Queued to download */
+    public const STATUS_DOWNLOAD = 4; /* Downloading */
+    public const STATUS_SEED_WAIT = 5; /* Queued to seed */
+    public const STATUS_SEED = 6; /* Seeding */
+    public const STATUS_ISOLATED = 7; /* Isolated */
 
     /**
      * Seed Ratio Modes.
      *
      * Field: seedRatioMode
      */
-    const RATIO_USE_GLOBAL = 0;
-    const RATIO_USE_LOCAL = 1;
-    const RATIO_UNLIMITED = 2;
+    public const RATIO_USE_GLOBAL = 0;
+    public const RATIO_USE_LOCAL = 1;
+    public const RATIO_UNLIMITED = 2;
 
     /**
      * Errors.
@@ -43,23 +43,23 @@ class Torrent extends AbstractModel
      * Field: error
      */
     /* everything's fine */
-    const ERROR_NONE = 0;
+    public const ERROR_NONE = 0;
     /* when we anounced to the tracker, we got a warning in the response */
-    const ERROR_TRACKER_WARNING = 1;
+    public const ERROR_TRACKER_WARNING = 1;
     /* when we anounced to the tracker, we got an error in the response */
-    const ERROR_TRACKER_ERROR = 2;
+    public const ERROR_TRACKER_ERROR = 2;
     /* local trouble, such as disk full or permissions error */
-    const ERROR_LOCAL_ERROR = 3;
+    public const ERROR_LOCAL_ERROR = 3;
 
     /**
      * Tracker Stats.
      *
      * Field: trackerStats->announceState
      */
-    const TRACKER_INACTIVE = 0;
-    const TRACKER_WAITING = 1;
-    const TRACKER_QUEUED = 2;
-    const TRACKER_ACTIVE = 3;
+    public const TRACKER_INACTIVE = 0;
+    public const TRACKER_WAITING = 1;
+    public const TRACKER_QUEUED = 2;
+    public const TRACKER_ACTIVE = 3;
 
     /**
      * Common Fields.
@@ -163,9 +163,9 @@ class Torrent extends AbstractModel
     /**
      * Get Name.
      *
-     * @return mixed
+     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->get('name', 'Unknown');
     }
@@ -267,7 +267,7 @@ class Torrent extends AbstractModel
      */
     public function getFileCount()
     {
-        return count($this->get('files', 0));
+        return \count($this->get('files', 0));
     }
 
     /**
@@ -389,7 +389,7 @@ class Torrent extends AbstractModel
      *
      * @return string
      */
-    public function getStatusString()
+    public function getStatusString(): ?string
     {
         switch ($this->get('status')) {
             case static::STATUS_STOPPED:
@@ -410,7 +410,6 @@ class Torrent extends AbstractModel
                 return 'Unknown';
             default:
                 return 'Error';
-
         }
     }
 
@@ -439,9 +438,9 @@ class Torrent extends AbstractModel
     /**
      * Get Error Message.
      *
-     * @return null|string
+     * @return string|null
      */
-    public function getErrorMessage()
+    public function getErrorMessage(): ?string
     {
         $str = $this->get('errorString');
         switch ($this->get('error')) {
