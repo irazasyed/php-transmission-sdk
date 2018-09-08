@@ -31,7 +31,7 @@ class Client
      *
      * @var string
      */
-    const VERSION = '1.3.1';
+    public const VERSION = '1.3.2';
 
     /**
      * Transmission-RPC Hostname
@@ -57,20 +57,20 @@ class Client
     /**
      * @var History
      */
-    private $responseHistory;
+    protected $responseHistory;
 
     /**
      * @var Builder
      */
-    private $httpClientBuilder;
+    protected $httpClientBuilder;
 
     /**
      * Instantiate a new Transmission Client.
      *
-     * @param null|string  $hostname
-     * @param null|int     $port
-     * @param null|string  $username
-     * @param null|string  $password
+     * @param string|null  $hostname
+     * @param int|null     $port
+     * @param string|null  $username
+     * @param string|null  $password
      * @param Builder|null $httpClientBuilder
      */
     public function __construct(
@@ -115,9 +115,7 @@ class Client
         string $username = null,
         string $password = null
     ): self {
-        $client = new static($hostname, $port, $username, $password);
-
-        return $client;
+        return new static($hostname, $port, $username, $password);
     }
 
     /**
@@ -138,9 +136,7 @@ class Client
         string $username = null,
         string $password = null
     ): self {
-        $builder = new Builder($httpClient);
-
-        return new static($hostname, $port, $username, $password, $builder);
+        return new static($hostname, $port, $username, $password, new Builder($httpClient));
     }
 
     /**
@@ -192,6 +188,9 @@ class Client
      * @see start()
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function startAll(): bool
     {
@@ -201,12 +200,15 @@ class Client
     /**
      * Start one or more torrents.
      *
-     * @see https://git.io/transmission-rpc-specs Torrent Action Requests.
+     * @see https://git.io/transmission-rpc-specs Transfer Action Requests.
      *
      * @param mixed $ids One or more torrent ids, sha1 hash strings, or both OR "recently-active", for recently-active
      *                   torrents. All torrents are used if no value is given.
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function start($ids = null): bool
     {
@@ -223,6 +225,9 @@ class Client
      * @param mixed $ids One or more torrent ids, as described in 3.1 of specs.
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function startNow($ids = null): bool
     {
@@ -237,8 +242,11 @@ class Client
      * @see stop()
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
-    public function stopAll()
+    public function stopAll(): bool
     {
         return $this->stop();
     }
@@ -251,6 +259,9 @@ class Client
      * @param mixed $ids One or more torrent ids, as described in 3.1 of specs.
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function stop($ids = null): bool
     {
@@ -267,6 +278,9 @@ class Client
      * @param mixed $ids One or more torrent ids, as described in 3.1 of specs.
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function verify($ids = null): bool
     {
@@ -283,6 +297,9 @@ class Client
      * @param mixed $ids One or more torrent ids, as described in 3.1 of specs.
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function reannounce($ids = null): bool
     {
@@ -300,6 +317,9 @@ class Client
      * @param array $arguments An associative array of arguments to set.
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function set($ids, array $arguments): bool
     {
@@ -315,6 +335,9 @@ class Client
      * @param array|null $fields
      *
      * @return Collection
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function getAll(array $fields = null): Collection
     {
@@ -331,6 +354,9 @@ class Client
      * @param array $fields An array of return fields, no value will fallback to default fields.
      *
      * @return Collection
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function get($ids = null, array $fields = null): Collection
     {
@@ -356,8 +382,11 @@ class Client
      * @param array       $optionalArgs Other optional arguments.
      *
      * @return Collection
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
-    public function addFile($file, string $savepath = null, array $optionalArgs = [])
+    public function addFile($file, string $savepath = null, array $optionalArgs = []): Collection
     {
         return $this->add($file, true, $savepath, $optionalArgs);
     }
@@ -370,8 +399,11 @@ class Client
      * @param array       $optionalArgs Other optional arguments.
      *
      * @return Collection
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
-    public function addUrl($url, string $savepath = null, array $optionalArgs = [])
+    public function addUrl($url, string $savepath = null, array $optionalArgs = []): Collection
     {
         return $this->add($url, false, $savepath, $optionalArgs);
     }
@@ -387,6 +419,9 @@ class Client
      * @param  array   $optionalArgs Other optional arguments.
      *
      * @return Collection
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function add(
         string $torrent,
@@ -399,7 +434,7 @@ class Client
         $arguments[$metainfo ? 'metainfo' : 'filename'] = $metainfo ? base64_encode($torrent) : $torrent;
 
         if ($savepath !== null) {
-            $arguments['download-dir'] = (string)$savepath;
+            $arguments['download-dir'] = $savepath;
         }
 
         $data = $this->api('torrent-add', array_merge($arguments, $optionalArgs));
@@ -426,6 +461,9 @@ class Client
      * @param bool  $deleteLocalData Also remove local data? (default: false).
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function remove($ids, bool $deleteLocalData = false): bool
     {
@@ -445,6 +483,9 @@ class Client
      * @param bool   $move     Move from previous location or search "location" for files (default: true).
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function move($ids, string $location, bool $move = true): bool
     {
@@ -463,6 +504,9 @@ class Client
      * @param string $name The file or folder's new name.
      *
      * @return array
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function rename($ids, string $path, string $name): array
     {
@@ -479,6 +523,9 @@ class Client
      *                         "version", and "session-id"
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function setSettings(array $arguments): bool
     {
@@ -495,6 +542,9 @@ class Client
      * @param array|null $fields
      *
      * @return array
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function getSettings(array $fields = null): array
     {
@@ -507,6 +557,9 @@ class Client
      * @see https://git.io/transmission-rpc-specs "session-stats" for response arguments.
      *
      * @return array
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function sessionStats(): array
     {
@@ -519,6 +572,9 @@ class Client
      * @see https://git.io/transmission-rpc-specs "blocklist-update" for response arguments.
      *
      * @return array
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function updateBlocklist(): array
     {
@@ -531,6 +587,9 @@ class Client
      * @see https://git.io/transmission-rpc-specs "port-test" for response arguments.
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function portTest(): bool
     {
@@ -543,6 +602,9 @@ class Client
      * @see https://git.io/transmission-rpc-specs "session-close".
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function close(): bool
     {
@@ -560,6 +622,9 @@ class Client
      *                   torrents. All torrents are used if no value is given.
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function queueMoveTop($ids = null): bool
     {
@@ -577,6 +642,9 @@ class Client
      *                   torrents. All torrents are used if no value is given.
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function queueMoveUp($ids = null): bool
     {
@@ -594,6 +662,9 @@ class Client
      *                   torrents. All torrents are used if no value is given.
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function queueMoveDown($ids = null): bool
     {
@@ -611,6 +682,9 @@ class Client
      *                   torrents. All torrents are used if no value is given.
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function queueMoveBottom($ids = null): bool
     {
@@ -627,6 +701,9 @@ class Client
      * @param null|string $path Path to check free space (default: download-dir).
      *
      * @return array
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function freeSpace(string $path = null): array
     {
@@ -640,7 +717,10 @@ class Client
     /**
      * Seed Ratio Limit.
      *
-     * @return mixed
+     * @return int|float
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function seedRatioLimit()
     {
@@ -659,6 +739,9 @@ class Client
      * @param string $downloadDir Path to download torrents.
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function updateDownloadDir(string $downloadDir): bool
     {
@@ -676,6 +759,9 @@ class Client
      * @param bool   $enableIncompleteDir Is incomplete dir enabled? (default: true).
      *
      * @return bool
+     * @throws NetworkException
+     * @throws TransmissionException
+     * @throws \Http\Client\Exception
      */
     public function updateIncompleteDir(string $incompleteDir, bool $enableIncompleteDir = true): bool
     {
@@ -778,7 +864,7 @@ class Client
     /**
      * @return History
      */
-    public function getResponseHistory()
+    public function getResponseHistory(): History
     {
         return $this->responseHistory;
     }
