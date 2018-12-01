@@ -11,10 +11,10 @@ use Illuminate\Support\Carbon;
 class Formatter
 {
     /** Used by formatBytes() modes */
-    const UNITS_MODE_DECIMAL = 0;
-    const UNITS_MODE_BINARY = 1;
+    public const UNITS_MODE_DECIMAL = 0;
+    public const UNITS_MODE_BINARY = 1;
     /** Speed */
-    const SPEED_KBPS = 1000;
+    public const SPEED_KBPS = 1000;
 
     /**
      * Formats bytes into a human readable string if $format is true, otherwise return $bytes as is.
@@ -31,15 +31,12 @@ class Formatter
             return $bytes;
         }
 
-        switch ($mode) {
-            case static::UNITS_MODE_BINARY: // Binary (Used with memory size formating)
-                $base = 1024;
-                $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
-                break;
-            default: // Decimal (Disk space)
-                $base = 1000;
-                $units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-                break;
+        if ($mode === static::UNITS_MODE_BINARY) { // Binary (Used with memory size formating)
+            $base = 1024;
+            $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+        } else { // Decimal (Disk space)
+            $base = 1000;
+            $units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         }
 
         $i = 0;
@@ -59,7 +56,7 @@ class Formatter
      *
      * @return string
      */
-    public static function speedBps($Bps)
+    public static function speedBps($Bps): string
     {
         return static::speed(static::bpsToKBps($Bps));
     }
@@ -71,7 +68,7 @@ class Formatter
      *
      * @return float
      */
-    public static function bpsToKBps($Bps)
+    public static function bpsToKBps($Bps): float
     {
         return floor($Bps / static::SPEED_KBPS);
     }
@@ -83,7 +80,7 @@ class Formatter
      *
      * @return string
      */
-    public static function speed($KBps)
+    public static function speed($KBps): string
     {
         $speed = $KBps;
 
@@ -114,7 +111,7 @@ class Formatter
      *
      * @return string
      */
-    public static function trunicateNumber($number, int $decimals = 2)
+    public static function trunicateNumber($number, int $decimals = 2): string
     {
         return bcdiv($number, 1, $decimals);
     }
@@ -129,13 +126,13 @@ class Formatter
      */
     public static function castAttribute($type, $value)
     {
-        if (is_null($value)) {
+        if ($value === null) {
             return $value;
         }
 
         switch ($type) {
             case 'collection':
-                return collect(is_array($value) ? $value : (new static)->fromJson($value));
+                return collect(\is_array($value) ? $value : (new static)->fromJson($value));
             case 'interval':
                 return $value < 1 ? -1 : CarbonInterval::seconds($value)->cascade();
             case 'date':
@@ -162,7 +159,7 @@ class Formatter
      *
      * @return string
      */
-    protected function asJson($value)
+    protected function asJson($value): string
     {
         return json_encode($value);
     }
@@ -187,7 +184,7 @@ class Formatter
      *
      * @return \Illuminate\Support\Carbon
      */
-    protected function asDate($value)
+    protected function asDate($value): Carbon
     {
         return $this->asDateTime($value)->startOfDay();
     }
@@ -199,7 +196,7 @@ class Formatter
      *
      * @return \Illuminate\Support\Carbon
      */
-    protected function asDateTime($value)
+    protected function asDateTime($value): Carbon
     {
         // If this value is already a Carbon instance, we shall just return it as is.
         // This prevents us having to re-instantiate a Carbon instance when we know
@@ -225,7 +222,7 @@ class Formatter
      *
      * @return int
      */
-    protected function asTimestamp($value)
+    protected function asTimestamp($value): int
     {
         return $this->asDateTime($value)->getTimestamp();
     }

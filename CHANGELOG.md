@@ -2,6 +2,14 @@
 
 All notable changes will be documented in this file.
 
+## 1.4 - 2018-12-02
+
+### Changed
+
+- Upgrade Dependency Packages.
+- Typehint and cast.
+- Optimize Code.
+
 ## 1.3.1 - 2018-08-16
 
 ### Changed

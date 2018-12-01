@@ -369,9 +369,7 @@ class Client
             return collect();
         }
 
-        $torrents = collect($torrentsInfo)->mapInto(Torrent::class);
-
-        return $torrents;
+        return collect($torrentsInfo)->mapInto(Torrent::class);
     }
 
     /**
