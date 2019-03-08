@@ -2,6 +2,7 @@
 
 namespace Transmission\Models;
 
+use Illuminate\Support\Str; 
 use Illuminate\Support\Collection;
 use Transmission\Formatter;
 
@@ -97,8 +98,8 @@ class AbstractModel extends Collection
      */
     public function __call($method, $arguments)
     {
-        $attribute = camel_case(str_after($method, 'get'));
-        if (!starts_with($method, 'get') || !$this->has($attribute)) {
+        $attribute = Str::camel(Str::after($method, 'get'));
+        if (!Str::startsWith($method, 'get') || !$this->has($attribute)) {
             throw new \BadMethodCallException(sprintf(
                 'Method %s::%s does not exist.', static::class, $method
             ));
