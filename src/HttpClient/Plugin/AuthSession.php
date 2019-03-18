@@ -2,6 +2,7 @@
 
 namespace Transmission\HttpClient\Plugin;
 
+use Http\Promise\Promise;
 use Http\Client\Common\Plugin;
 use Psr\Http\Message\RequestInterface;
 
@@ -10,9 +11,7 @@ use Psr\Http\Message\RequestInterface;
  */
 class AuthSession implements Plugin
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $sessionId;
 
     /**
@@ -26,7 +25,7 @@ class AuthSession implements Plugin
     /**
      * {@inheritdoc}
      */
-    public function handleRequest(RequestInterface $request, callable $next, callable $first)
+    public function handleRequest(RequestInterface $request, callable $next, callable $first): Promise
     {
         if (filled($this->sessionId)) {
             $request = $request->withHeader('X-Transmission-Session-Id', $this->sessionId);

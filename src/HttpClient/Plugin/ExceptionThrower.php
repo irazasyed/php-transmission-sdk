@@ -2,11 +2,11 @@
 
 namespace Transmission\HttpClient\Plugin;
 
+use Http\Promise\Promise;
 use Http\Client\Common\Plugin;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Transmission\Exception\NetworkException;
-use Transmission\Exception\RuntimeException;
 use Transmission\Exception\TransmissionException;
 use Transmission\HttpClient\Message\ResponseMediator;
 
@@ -18,7 +18,7 @@ class ExceptionThrower implements Plugin
     /**
      * {@inheritdoc}
      */
-    public function handleRequest(RequestInterface $request, callable $next, callable $first)
+    public function handleRequest(RequestInterface $request, callable $next, callable $first): Promise
     {
         return $next($request)->then(function (ResponseInterface $response) {
             $statusCode = $response->getStatusCode();

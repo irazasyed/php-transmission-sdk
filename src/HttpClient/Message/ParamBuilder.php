@@ -12,9 +12,9 @@ final class ParamBuilder
      *
      * @param array $params
      *
-     * @return string
+     * @return array
      */
-    public static function build($params)
+    public static function build($params): array
     {
         return collect($params)
             ->reject(function ($value) {
@@ -22,16 +22,22 @@ final class ParamBuilder
             })->transform(function ($value) {
                 if (is_object($value)) {
                     return $value->toArray();
-                } elseif (is_array($value)) {
+                }
+
+                if (is_array($value)) {
                     return static::build($value);
-                } elseif (is_numeric($value)) {
+                }
+
+                if (is_numeric($value)) {
                     return $value + 0;
-                } elseif (is_bool($value)) {
+                }
+
+                if (is_bool($value)) {
                     return (int)$value;
-                } elseif (is_string($value)) { // Encode if it's not UTF-8
-                    if (mb_detect_encoding($value, 'auto') !== 'UTF-8') {
-                        return mb_convert_encoding($value, 'UTF-8');
-                    }
+                }
+
+                if (is_string($value) && mb_detect_encoding($value, 'auto') !== 'UTF-8') {
+                    return mb_convert_encoding($value, 'UTF-8');
                 }
 
                 return $value;

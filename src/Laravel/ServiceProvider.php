@@ -6,6 +6,9 @@ use Illuminate\Foundation\Application as LaravelApplication;
 use Laravel\Lumen\Application as LumenApplication;
 use Transmission\Client;
 
+/**
+ * Class ServiceProvider
+ */
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
     /**

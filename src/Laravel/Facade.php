@@ -4,6 +4,9 @@ namespace Transmission\Laravel;
 
 use Transmission\Client;
 
+/**
+ * Class Facade
+ */
 class Facade extends \Illuminate\Support\Facades\Facade
 {
     /**

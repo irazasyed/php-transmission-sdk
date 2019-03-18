@@ -7,7 +7,7 @@ namespace Transmission\Exception;
  */
 class NetworkException extends \Exception
 {
-    const CONFLICT = 409;
+    public const CONFLICT = 409;
 
     public static $statusCodes = [
         // 4xx: Client Error - The request contains bad syntax or cannot be fulfilled.

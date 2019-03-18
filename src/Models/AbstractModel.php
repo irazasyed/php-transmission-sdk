@@ -55,7 +55,7 @@ class AbstractModel extends Collection
      *
      * @return $this
      */
-    public function enableCasting($castingEnabled = true)
+    public function enableCasting($castingEnabled = true): self
     {
         $this->castingEnabled = $castingEnabled;
 
@@ -65,7 +65,7 @@ class AbstractModel extends Collection
     /**
      * Cast All Attributes
      */
-    protected function castAllAttributes()
+    protected function castAllAttributes(): void
     {
         $this->transform(function ($value, $key) {
             return $this->castAttribute($key, $value, $this->castingEnabled);
