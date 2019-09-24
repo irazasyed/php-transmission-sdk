@@ -26,62 +26,45 @@ use Psr\Http\Client as Psr18;
  */
 class Client
 {
-    /**
-     * SDK Version
-     *
-     * @var string
-     */
+    /** @var string SDK Version */
     public const VERSION = '2.0.0';
 
-    /**
-     * Transmission-RPC Hostname
-     *
-     * @var string
-     */
-    public $hostname;
+    /** @var string Transmission-RPC Host */
+    public $host;
 
-    /**
-     * Transmission-RPC Port
-     *
-     * @var string
-     */
+    /** @var string Transmission-RPC Port */
     public $port;
 
-    /**
-     * Transmission-RPC Path
-     *
-     * @var string
-     */
+    /** @var string Transmission-RPC Path */
     public $path = '/transmission/rpc';
 
-    /**
-     * @var History
-     */
+    /** @var History */
     protected $responseHistory;
 
-    /**
-     * @var Builder
-     */
+    /** @var Builder */
     protected $httpClientBuilder;
+
+    /** @var bool Enable TLS (HTTPS) */
+    protected $enableTLS = false;
 
     /**
      * Instantiate a new Transmission Client.
      *
-     * @param string|null  $hostname
-     * @param int|null     $port
-     * @param string|null  $username
-     * @param string|null  $password
-     * @param Builder|null $httpClientBuilder
+     * @param  string|null   $host
+     * @param  int|null      $port
+     * @param  string|null   $username
+     * @param  string|null   $password
+     * @param  Builder|null  $httpClientBuilder
      */
     public function __construct(
-        string $hostname = null,
+        string $host = null,
         int $port = null,
         string $username = null,
         string $password = null,
         Builder $httpClientBuilder = null
     ) {
-        $this->hostname = $hostname ?? env('TRANSMISSION_HOSTNAME', '127.0.0.1');
-        $this->port = $port ?? env('TRANSMISSION_PORT', 9091);
+        $this->host = $host ?? '127.0.0.1';
+        $this->port = $port ?? 9091;
 
         $this->responseHistory = new History();
         $this->httpClientBuilder = $httpClientBuilder ?? new Builder();
@@ -91,9 +74,6 @@ class Client
             'User-Agent' => $this->defaultUserAgent(),
         ]));
 
-        $username = $username ?? env('TRANSMISSION_USERNAME');
-        $password = $password ?? env('TRANSMISSION_PASSWORD', '');
-
         if (filled($username)) {
             $this->authenticate($username, $password);
         }
@@ -102,41 +82,63 @@ class Client
     /**
      * Create a Transmission\Client.
      *
-     * @param null|string $hostname
-     * @param null|int    $port
-     * @param null|string $username
-     * @param null|string $password
+     * @param  null|string  $host
+     * @param  null|int     $port
+     * @param  null|string  $username
+     * @param  null|string  $password
      *
      * @return Client
      */
     public static function create(
-        string $hostname = null,
+        string $host = null,
         int $port = null,
         string $username = null,
         string $password = null
     ): self {
-        return new static($hostname, $port, $username, $password);
+        return new static($host, $port, $username, $password);
     }
 
     /**
      * Create a Transmission\Client using an HttpClient.
      *
-     * @param ClientInterface $httpClient
-     * @param null|string     $hostname
-     * @param null|int        $port
-     * @param null|string     $username
-     * @param null|string     $password
+     * @param  ClientInterface  $httpClient
+     * @param  null|string      $host
+     * @param  null|int         $port
+     * @param  null|string      $username
+     * @param  null|string      $password
      *
      * @return Client
      */
     public static function createWithHttpClient(
         ClientInterface $httpClient,
-        string $hostname = null,
+        string $host = null,
         int $port = null,
         string $username = null,
         string $password = null
     ): self {
-        return new static($hostname, $port, $username, $password, new Builder($httpClient));
+        return new static($host, $port, $username, $password, new Builder($httpClient));
+    }
+
+    /**
+     * Determine if TLS is enabled.
+     *
+     * @return bool
+     */
+    public function isTLSEnabled(): bool
+    {
+        return $this->enableTLS;
+    }
+
+    /**
+     * Enable TLS.
+     *
+     * @return $this
+     */
+    public function enableTLS(): self
+    {
+        $this->enableTLS = true;
+
+        return $this;
     }
 
     /**
@@ -152,8 +154,8 @@ class Client
     /**
      * Authenticate the user for all next requests
      *
-     * @param string      $username
-     * @param null|string $password
+     * @param  string       $username
+     * @param  null|string  $password
      *
      * @return Client
      */
@@ -170,7 +172,7 @@ class Client
     /**
      * Set Session ID.
      *
-     * @param string $sessionId
+     * @param  string  $sessionId
      *
      * @return Client
      */
@@ -185,9 +187,9 @@ class Client
     /**
      * Start All Torrents.
      *
+     * @return bool
      * @see start()
      *
-     * @return bool
      */
     public function startAll(): bool
     {
@@ -199,8 +201,8 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs Transfer Action Requests.
      *
-     * @param mixed $ids One or more torrent ids, sha1 hash strings, or both OR "recently-active", for recently-active
-     *                   torrents. All torrents are used if no value is given.
+     * @param  mixed  $ids  One or more torrent ids, sha1 hash strings, or both OR "recently-active", for
+     *     recently-active torrents. All torrents are used if no value is given.
      *
      * @return bool
      */
@@ -216,7 +218,7 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs Torrent Action Requests.
      *
-     * @param mixed $ids One or more torrent ids, as described in 3.1 of specs.
+     * @param  mixed  $ids  One or more torrent ids, as described in 3.1 of specs.
      *
      * @return bool
      */
@@ -230,9 +232,9 @@ class Client
     /**
      * Stop All Torrents.
      *
+     * @return bool
      * @see stop()
      *
-     * @return bool
      */
     public function stopAll(): bool
     {
@@ -244,7 +246,7 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs Torrent Action Requests.
      *
-     * @param mixed $ids One or more torrent ids, as described in 3.1 of specs.
+     * @param  mixed  $ids  One or more torrent ids, as described in 3.1 of specs.
      *
      * @return bool
      */
@@ -260,7 +262,7 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs Torrent Action Requests.
      *
-     * @param mixed $ids One or more torrent ids, as described in 3.1 of specs.
+     * @param  mixed  $ids  One or more torrent ids, as described in 3.1 of specs.
      *
      * @return bool
      */
@@ -276,7 +278,7 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs Torrent Action Requests.
      *
-     * @param mixed $ids One or more torrent ids, as described in 3.1 of specs.
+     * @param  mixed  $ids  One or more torrent ids, as described in 3.1 of specs.
      *
      * @return bool
      */
@@ -292,8 +294,8 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs "torrent-set" for available arguments.
      *
-     * @param mixed $ids       One or more torrent ids, as described in 3.1 of specs.
-     * @param array $arguments An associative array of arguments to set.
+     * @param  mixed  $ids  One or more torrent ids, as described in 3.1 of specs.
+     * @param  array  $arguments  An associative array of arguments to set.
      *
      * @return bool
      */
@@ -308,7 +310,7 @@ class Client
     /**
      * Get All Torrents.
      *
-     * @param array|null $fields
+     * @param  array|null  $fields
      *
      * @return Collection
      */
@@ -323,8 +325,8 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs "torrent-get" for available fields.
      *
-     * @param mixed $ids    One or more torrent ids, as described in 3.1 of specs.
-     * @param array $fields An array of return fields, no value will fallback to default fields.
+     * @param  mixed  $ids  One or more torrent ids, as described in 3.1 of specs.
+     * @param  array  $fields  An array of return fields, no value will fallback to default fields.
      *
      * @return Collection
      */
@@ -345,9 +347,9 @@ class Client
     /**
      * Add a Torrent File to the download queue.
      *
-     * @param string      $file         Torrent File Content.
-     * @param string|null $savepath     Path to download the torrent to.
-     * @param array       $optionalArgs Other optional arguments.
+     * @param  string       $file  Torrent File Content.
+     * @param  string|null  $savepath  Path to download the torrent to.
+     * @param  array        $optionalArgs  Other optional arguments.
      *
      * @return Collection
      */
@@ -359,9 +361,9 @@ class Client
     /**
      * Add a Torrent by URL to the download queue.
      *
-     * @param string      $url          Magnet URI/URL of the torrent file.
-     * @param string|null $savepath     Path to download the torrent to.
-     * @param array       $optionalArgs Other optional arguments.
+     * @param  string       $url  Magnet URI/URL of the torrent file.
+     * @param  string|null  $savepath  Path to download the torrent to.
+     * @param  array        $optionalArgs  Other optional arguments.
      *
      * @return Collection
      */
@@ -375,10 +377,10 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs "torrent-add" for available arguments.
      *
-     * @param  string  $torrent      Magnet URI/URL of the torrent file OR .torrent content.
-     * @param  boolean $metainfo     Is given torrent a metainfo? (default: false).
-     * @param  string  $savepath     Path to download the torrent to.
-     * @param  array   $optionalArgs Other optional arguments.
+     * @param  string   $torrent  Magnet URI/URL of the torrent file OR .torrent content.
+     * @param  boolean  $metainfo  Is given torrent a metainfo? (default: false).
+     * @param  string   $savepath  Path to download the torrent to.
+     * @param  array    $optionalArgs  Other optional arguments.
      *
      * @return Collection
      */
@@ -416,8 +418,8 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs "torrent-remove" for available arguments.
      *
-     * @param mixed $ids             One or more torrent ids, as described in 3.1 of specs.
-     * @param bool  $deleteLocalData Also remove local data? (default: false).
+     * @param  mixed  $ids  One or more torrent ids, as described in 3.1 of specs.
+     * @param  bool   $deleteLocalData  Also remove local data? (default: false).
      *
      * @return bool
      */
@@ -434,9 +436,9 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs "torrent-set-location" for available arguments.
      *
-     * @param mixed  $ids      One or more torrent ids, as described in 3.1 of specs.
-     * @param string $location The new torrent location.
-     * @param bool   $move     Move from previous location or search "location" for files (default: true).
+     * @param  mixed   $ids  One or more torrent ids, as described in 3.1 of specs.
+     * @param  string  $location  The new torrent location.
+     * @param  bool    $move  Move from previous location or search "location" for files (default: true).
      *
      * @return bool
      */
@@ -452,9 +454,9 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs "torrent-rename-path" for available arguments.
      *
-     * @param mixed  $ids  One torrent id, as described in 3.1 of specs.
-     * @param string $path The path to the file or folder that will be renamed.
-     * @param string $name The file or folder's new name.
+     * @param  mixed   $ids  One torrent id, as described in 3.1 of specs.
+     * @param  string  $path  The path to the file or folder that will be renamed.
+     * @param  string  $name  The file or folder's new name.
      *
      * @return array
      */
@@ -468,7 +470,7 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs "session-set" for available arguments.
      *
-     * @param array $arguments one or more of spec's arguments, except: "blocklist-size",
+     * @param  array  $arguments  one or more of spec's arguments, except: "blocklist-size",
      *                         "config-dir", "rpc-version", "rpc-version-minimum",
      *                         "version", and "session-id"
      *
@@ -486,7 +488,7 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs "session-get" for available fields.
      *
-     * @param array|null $fields
+     * @param  array|null  $fields
      *
      * @return array
      */
@@ -550,8 +552,8 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs Queue Movement Requests.
      *
-     * @param mixed $ids One or more torrent ids, sha1 hash strings, or both OR "recently-active", for recently-active
-     *                   torrents. All torrents are used if no value is given.
+     * @param  mixed  $ids  One or more torrent ids, sha1 hash strings, or both OR "recently-active", for
+     *     recently-active torrents. All torrents are used if no value is given.
      *
      * @return bool
      */
@@ -567,8 +569,8 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs Queue Movement Requests.
      *
-     * @param mixed $ids One or more torrent ids, sha1 hash strings, or both OR "recently-active", for recently-active
-     *                   torrents. All torrents are used if no value is given.
+     * @param  mixed  $ids  One or more torrent ids, sha1 hash strings, or both OR "recently-active", for
+     *     recently-active torrents. All torrents are used if no value is given.
      *
      * @return bool
      */
@@ -584,8 +586,8 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs Queue Movement Requests.
      *
-     * @param mixed $ids One or more torrent ids, sha1 hash strings, or both OR "recently-active", for recently-active
-     *                   torrents. All torrents are used if no value is given.
+     * @param  mixed  $ids  One or more torrent ids, sha1 hash strings, or both OR "recently-active", for
+     *     recently-active torrents. All torrents are used if no value is given.
      *
      * @return bool
      */
@@ -601,8 +603,8 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs Queue Movement Requests.
      *
-     * @param mixed $ids One or more torrent ids, sha1 hash strings, or both OR "recently-active", for recently-active
-     *                   torrents. All torrents are used if no value is given.
+     * @param  mixed  $ids  One or more torrent ids, sha1 hash strings, or both OR "recently-active", for
+     *     recently-active torrents. All torrents are used if no value is given.
      *
      * @return bool
      */
@@ -618,7 +620,7 @@ class Client
      *
      * @see https://git.io/transmission-rpc-specs "free-space" for arguments.
      *
-     * @param null|string $path Path to check free space (default: download-dir).
+     * @param  null|string  $path  Path to check free space (default: download-dir).
      *
      * @return array
      */
@@ -650,7 +652,7 @@ class Client
     /**
      * Update Download Dir.
      *
-     * @param string $downloadDir Path to download torrents.
+     * @param  string  $downloadDir  Path to download torrents.
      *
      * @return bool
      */
@@ -666,8 +668,8 @@ class Client
     /**
      * Update & Enable Incomplete Dir.
      *
-     * @param string $incompleteDir       Path to store incomplete torrents.
-     * @param bool   $enableIncompleteDir Is incomplete dir enabled? (default: true).
+     * @param  string  $incompleteDir  Path to store incomplete torrents.
+     * @param  bool    $enableIncompleteDir  Is incomplete dir enabled? (default: true).
      *
      * @return bool
      */
@@ -684,8 +686,8 @@ class Client
     /**
      * Request API.
      *
-     * @param string $method
-     * @param array  $params
+     * @param  string  $method
+     * @param  array   $params
      *
      * @return mixed
      */
@@ -719,10 +721,10 @@ class Client
     /**
      * Find and Set Session ID from the response.
      *
-     * @param ResponseInterface $response
+     * @param  ResponseInterface  $response
      *
-     * @return Client
      * @throws TransmissionException
+     * @return Client
      */
     protected function findAndSetSessionId(ResponseInterface $response): self
     {
@@ -744,7 +746,7 @@ class Client
      */
     protected function transmissionUrl(): string
     {
-        return $this->hostname . ':' . $this->port . $this->path;
+        return 'http'.($this->isTLSEnabled() ? 's' : '').'://'.$this->host.':'.$this->port.$this->path;
     }
 
     /**
@@ -754,7 +756,7 @@ class Client
      */
     protected function defaultUserAgent(): string
     {
-        return 'PHP-Transmission-SDK/' . self::VERSION;
+        return 'PHP-Transmission-SDK/'.self::VERSION;
     }
 
     /**

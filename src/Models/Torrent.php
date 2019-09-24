@@ -44,9 +44,9 @@ class Torrent extends AbstractModel
      */
     /* everything's fine */
     public const ERROR_NONE = 0;
-    /* when we anounced to the tracker, we got a warning in the response */
+    /* when we announced to the tracker, we got a warning in the response */
     public const ERROR_TRACKER_WARNING = 1;
-    /* when we anounced to the tracker, we got an error in the response */
+    /* when we announced to the tracker, we got an error in the response */
     public const ERROR_TRACKER_ERROR = 2;
     /* local trouble, such as disk full or permissions error */
     public const ERROR_LOCAL_ERROR = 3;
