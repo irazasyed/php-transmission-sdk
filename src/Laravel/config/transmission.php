@@ -6,12 +6,13 @@ return [
     | Transmission-RPC Config
     |--------------------------------------------------------------------------
     |
-    | Transmission-RPC Hostname and Port.
+    | Transmission-RPC Host and Port.
     |
     */
 
-    'hostname' => env('TRANSMISSION_HOSTNAME', '127.0.0.1'),
-    'port'     => env('TRANSMISSION_PORT', 9091),
+    'enableTLS' => env('TRANSMISSION_ENABLE_TLS', false),
+    'host'      => env('TRANSMISSION_HOST', '127.0.0.1'),
+    'port'      => env('TRANSMISSION_PORT', 9091),
 
     /*
     |--------------------------------------------------------------------------

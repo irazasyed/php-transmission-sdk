@@ -20,7 +20,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
     {
         if ($this->app instanceof LaravelApplication && $this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/config/transmission.php' => config_path('transmission.php'),
+                __DIR__.'/config/transmission.php' => config_path('transmission.php'),
             ]);
         } elseif ($this->app instanceof LumenApplication) {
             $this->app->configure('transmission');
@@ -34,15 +34,21 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__ . '/config/transmission.php', 'transmission');
+        $this->mergeConfigFrom(__DIR__.'/config/transmission.php', 'transmission');
 
         $this->app->singleton('transmission', function () {
-            return new Client(
-                config('transmission.hostname'),
+            $client = new Client(
+                config('transmission.host'),
                 config('transmission.port'),
                 config('transmission.username'),
                 config('transmission.password')
             );
+
+            if (config('transmission.enableTLS')) {
+                $client = $client->enableTLS();
+            }
+
+            return $client;
         });
 
         $this->app->alias('transmission', Client::class);
