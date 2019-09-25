@@ -2,24 +2,24 @@
 
 namespace Transmission;
 
+use Psr\Http\Client as Psr18;
+use Transmission\Models\Torrent;
+use Illuminate\Support\Collection;
+use Transmission\HttpClient\Builder;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\ResponseInterface;
+use Http\Message\Authentication\BasicAuth;
+use Transmission\HttpClient\Plugin\History;
+use Http\Client\Common\Plugin\HistoryPlugin;
+use Transmission\Exception\NetworkException;
+use Transmission\HttpClient\Plugin\AuthSession;
+use Transmission\Exception\TransmissionException;
+use Transmission\HttpClient\Message\ParamBuilder;
 use Http\Client\Common\Plugin\AuthenticationPlugin;
 use Http\Client\Common\Plugin\HeaderDefaultsPlugin;
-use Http\Client\Common\Plugin\HistoryPlugin;
-use Http\Message\Authentication\BasicAuth;
-use Illuminate\Support\Collection;
-use Psr\Http\Message\ResponseInterface;
 use Transmission\Exception\InvalidArgumentException;
-use Transmission\Exception\NetworkException;
-use Transmission\Exception\TransmissionException;
-use Transmission\HttpClient\Builder;
-use Transmission\HttpClient\Message\ParamBuilder;
-use Transmission\HttpClient\Message\ResponseMediator;
-use Transmission\HttpClient\Plugin\AuthSession;
 use Transmission\HttpClient\Plugin\ExceptionThrower;
-use Transmission\HttpClient\Plugin\History;
-use Transmission\Models\Torrent;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Client as Psr18;
+use Transmission\HttpClient\Message\ResponseMediator;
 
 /**
  * Transmission-RPC API SDK Client
