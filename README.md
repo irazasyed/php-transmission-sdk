@@ -1,9 +1,10 @@
 # PHP Transmission-RPC API SDK
 
+[![Join PHP Chat][ico-phpchat]][link-phpchat]
+[![Chat on Telegram][ico-telegram]][link-telegram]
+[![Laravel Package][ico-laravel]][link-repo]
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
-[![Build Status][ico-travis]][link-travis]
-[![Coverage Status][ico-scrutinizer]][link-scrutinizer]
 [![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
 
@@ -72,6 +73,9 @@ If you discover any security related issues, please email gh@lukonet.com instead
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
+[ico-phpchat]: https://img.shields.io/badge/Slack-PHP%20Chat-5c6aaa.svg?style=flat-square&logo=slack&labelColor=4A154B
+[ico-telegram]: https://img.shields.io/badge/@PHPChatCo-2CA5E0.svg?style=flat-square&logo=telegram&label=Telegram
+[ico-laravel]: https://img.shields.io/badge/Laravel-5|6-FF2D20.svg?style=flat-square&logo=laravel&labelColor=black&logoColor=white
 [ico-version]: https://img.shields.io/packagist/v/irazasyed/php-transmission-sdk.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
 [ico-travis]: https://img.shields.io/travis/irazasyed/php-transmission-sdk/master.svg?style=flat-square
@@ -81,6 +85,8 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 [sdk-usage]: https://user-images.githubusercontent.com/1915268/43494955-0c47765e-9553-11e8-851e-14139d8bcd0d.png
 
+[link-phpchat]: https://phpchat.co/?ref=php-transmission-sdk
+[link-telegram]: https://t.me/PHPChatCo
 [link-repo]: https://github.com/irazasyed/php-transmission-sdk
 [link-packagist]: https://packagist.org/packages/irazasyed/php-transmission-sdk
 [link-travis]: https://travis-ci.org/irazasyed/php-transmission-sdk
