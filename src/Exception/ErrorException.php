@@ -3,7 +3,7 @@
 namespace Transmission\Exception;
 
 /**
- * ErrorException
+ * ErrorException.
  */
 class ErrorException extends \ErrorException implements ExceptionInterface
 {

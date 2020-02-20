@@ -145,8 +145,9 @@ class Builder
      * @param array  $headers
      * @param null   $body
      *
-     * @return ResponseInterface
      * @throws \Psr\Http\Client\ClientExceptionInterface
+     *
+     * @return ResponseInterface
      */
     public function send(string $method, $uri, array $headers = [], $body = null): ResponseInterface
     {
@@ -161,8 +162,9 @@ class Builder
     /**
      * @param RequestInterface $request
      *
-     * @return ResponseInterface
      * @throws \Psr\Http\Client\ClientExceptionInterface
+     *
+     * @return ResponseInterface
      */
     public function sendRequest(RequestInterface $request): ResponseInterface
     {

@@ -33,7 +33,7 @@ class RequestBuilder
      * @param string            $method
      * @param string            $uri
      * @param array             $headers
-     * @param array|string|null $body Request body.
+     * @param array|string|null $body    Request body.
      *
      * @return RequestInterface
      */

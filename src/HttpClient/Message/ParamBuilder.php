@@ -3,7 +3,7 @@
 namespace Transmission\HttpClient\Message;
 
 /**
- * ParamBuilder
+ * ParamBuilder.
  */
 final class ParamBuilder
 {
@@ -33,7 +33,7 @@ final class ParamBuilder
                 }
 
                 if (is_bool($value)) {
-                    return (int)$value;
+                    return (int) $value;
                 }
 
                 if (is_string($value) && mb_detect_encoding($value, 'auto') !== 'UTF-8') {

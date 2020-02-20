@@ -5,7 +5,7 @@ namespace Transmission\Exception;
 use Http\Client\Exception;
 
 /**
- * ExceptionInterface
+ * ExceptionInterface.
  */
 interface ExceptionInterface extends Exception
 {

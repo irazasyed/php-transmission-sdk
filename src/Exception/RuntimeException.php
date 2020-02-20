@@ -3,7 +3,7 @@
 namespace Transmission\Exception;
 
 /**
- * RuntimeException
+ * RuntimeException.
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {

@@ -5,7 +5,7 @@ namespace Transmission\Models;
 use Transmission\Client;
 
 /**
- * Torrent
+ * Torrent.
  *
  * @method mixed getUploadRatio(bool $castingEnabled = false) Get Upload Ratio Value.
  * @method mixed getLeftUntilDone(bool $castingEnabled = false) Get Left Until Done Value.
@@ -191,7 +191,7 @@ class Torrent extends AbstractModel
      */
     public function getPercentDoneString(): string
     {
-        return $this->getPercentDone(true) . '%';
+        return $this->getPercentDone(true).'%';
     }
 
     /**
@@ -445,11 +445,11 @@ class Torrent extends AbstractModel
         $str = $this->get('errorString');
         switch ($this->get('error')) {
             case static::ERROR_TRACKER_WARNING:
-                return 'Tracker returned a warning: ' . $str;
+                return 'Tracker returned a warning: '.$str;
             case static::ERROR_TRACKER_ERROR:
-                return 'Tracker returned an error: ' . $str;
+                return 'Tracker returned an error: '.$str;
             case static::ERROR_LOCAL_ERROR:
-                return 'Error: ' . $str;
+                return 'Error: '.$str;
             default:
                 return null;
         }

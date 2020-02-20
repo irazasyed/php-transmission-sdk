@@ -6,7 +6,7 @@ use Carbon\CarbonInterval;
 use Illuminate\Support\Carbon;
 
 /**
- * Formatter
+ * Formatter.
  */
 class Formatter
 {
@@ -46,7 +46,7 @@ class Formatter
             $i++;
         }
 
-        return round($bytes, 2) . ' ' . $units[$i];
+        return round($bytes, 2).' '.$units[$i];
     }
 
     /**
@@ -85,22 +85,22 @@ class Formatter
         $speed = $KBps;
 
         if ($speed <= 999.95) { // 0 KBps to 999 K
-            return static::trunicateNumber($speed, 0) . ' KB/s';
+            return static::trunicateNumber($speed, 0).' KB/s';
         }
 
         $speed /= static::SPEED_KBPS;
 
         if ($speed <= 99.995) { // 1 M to 99.99 M
-            return static::trunicateNumber($speed, 2) . ' MB/s';
+            return static::trunicateNumber($speed, 2).' MB/s';
         }
         if ($speed <= 999.95) { // 100 M to 999.9 M
-            return static::trunicateNumber($speed, 1) . ' MB/s';
+            return static::trunicateNumber($speed, 1).' MB/s';
         }
 
         // insane speeds
         $speed /= static::SPEED_KBPS;
 
-        return static::trunicateNumber($speed, 2) . ' GB/s';
+        return static::trunicateNumber($speed, 2).' GB/s';
     }
 
     /**
@@ -132,15 +132,15 @@ class Formatter
 
         switch ($type) {
             case 'collection':
-                return collect(\is_array($value) ? $value : (new static)->fromJson($value));
+                return collect(\is_array($value) ? $value : (new static())->fromJson($value));
             case 'interval':
                 return $value < 1 ? -1 : CarbonInterval::seconds($value)->cascade();
             case 'date':
-                return (new static)->asDate($value);
+                return (new static())->asDate($value);
             case 'datetime':
-                return (new static)->asDateTime($value);
+                return (new static())->asDateTime($value);
             case 'timestamp':
-                return (new static)->asTimestamp($value);
+                return (new static())->asTimestamp($value);
             case 'size':
                 return static::formatBytes($value);
             case 'memory':
@@ -155,7 +155,7 @@ class Formatter
     /**
      * Encode the given value as JSON.
      *
-     * @param  mixed $value
+     * @param mixed $value
      *
      * @return string
      */
@@ -167,8 +167,8 @@ class Formatter
     /**
      * Decode the given JSON back into an array or object.
      *
-     * @param  string $value
-     * @param  bool   $asObject
+     * @param string $value
+     * @param bool   $asObject
      *
      * @return mixed
      */
@@ -180,7 +180,7 @@ class Formatter
     /**
      * Return a timestamp as DateTime object with time set to 00:00:00.
      *
-     * @param  mixed $value
+     * @param mixed $value
      *
      * @return \Illuminate\Support\Carbon
      */
@@ -192,7 +192,7 @@ class Formatter
     /**
      * Return a timestamp as DateTime object.
      *
-     * @param  mixed $value
+     * @param mixed $value
      *
      * @return \Illuminate\Support\Carbon
      */
@@ -218,7 +218,7 @@ class Formatter
     /**
      * Return a timestamp as unix timestamp.
      *
-     * @param  mixed $value
+     * @param mixed $value
      *
      * @return int
      */

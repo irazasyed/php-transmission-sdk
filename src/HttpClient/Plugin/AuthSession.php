@@ -2,8 +2,8 @@
 
 namespace Transmission\HttpClient\Plugin;
 
-use Http\Promise\Promise;
 use Http\Client\Common\Plugin;
+use Http\Promise\Promise;
 use Psr\Http\Message\RequestInterface;
 
 /**

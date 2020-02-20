@@ -3,7 +3,7 @@
 namespace Transmission\Exception;
 
 /**
- * NetworkException
+ * NetworkException.
  */
 class NetworkException extends \Exception
 {
@@ -72,10 +72,9 @@ class NetworkException extends \Exception
             $errorMessage = static::$statusCodes[$statusCode];
 
             if (filled($message)) {
-                $errorMessage = $errorMessage . ' - ' . $message;
+                $errorMessage = $errorMessage.' - '.$message;
             }
         }
-
 
         $message = sprintf('%d: %s', $statusCode, $errorMessage ?? $message);
 

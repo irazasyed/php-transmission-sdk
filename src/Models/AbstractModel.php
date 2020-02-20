@@ -2,12 +2,12 @@
 
 namespace Transmission\Models;
 
-use Illuminate\Support\Str; 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Transmission\Formatter;
 
 /**
- * AbstractModel
+ * AbstractModel.
  */
 class AbstractModel extends Collection
 {
@@ -29,6 +29,7 @@ class AbstractModel extends Collection
 
     /**
      * {@inheritdoc}
+     *
      * @param null|bool $castingEnabled
      */
     public function get($key, $default = null, $castingEnabled = null)
@@ -63,7 +64,7 @@ class AbstractModel extends Collection
     }
 
     /**
-     * Cast All Attributes
+     * Cast All Attributes.
      */
     protected function castAllAttributes(): void
     {
