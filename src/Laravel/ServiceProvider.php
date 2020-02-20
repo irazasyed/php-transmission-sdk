@@ -7,7 +7,7 @@ use Laravel\Lumen\Application as LumenApplication;
 use Transmission\Client;
 
 /**
- * Class ServiceProvider
+ * Class ServiceProvider.
  */
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {

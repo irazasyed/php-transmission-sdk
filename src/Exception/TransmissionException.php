@@ -3,7 +3,7 @@
 namespace Transmission\Exception;
 
 /**
- * TransmissionException
+ * TransmissionException.
  */
 class TransmissionException extends \Exception implements ExceptionInterface
 {

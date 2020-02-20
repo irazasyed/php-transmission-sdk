@@ -3,7 +3,7 @@
 namespace Transmission\Exception;
 
 /**
- * InvalidArgumentException
+ * InvalidArgumentException.
  */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {
