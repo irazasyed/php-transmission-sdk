@@ -7,9 +7,9 @@ use Transmission\Client;
 /**
  * Torrent.
  *
- * @method mixed getUploadRatio(bool $castingEnabled = false) Get Upload Ratio Value.
+ * @method mixed getUploadRatio(bool $castingEnabled = false)   Get Upload Ratio Value.
  * @method mixed getLeftUntilDone(bool $castingEnabled = false) Get Left Until Done Value.
- * @method mixed getHaveValid(bool $castingEnabled = false) Get Have Valid Value.
+ * @method mixed getHaveValid(bool $castingEnabled = false)     Get Have Valid Value.
  * @method mixed getHaveUnchecked(bool $castingEnabled = false) Get Have Unchecked Value.
  */
 class Torrent extends AbstractModel

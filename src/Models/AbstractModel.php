@@ -102,7 +102,9 @@ class AbstractModel extends Collection
         $attribute = Str::camel(Str::after($method, 'get'));
         if (!Str::startsWith($method, 'get') || !$this->has($attribute)) {
             throw new \BadMethodCallException(sprintf(
-                'Method %s::%s does not exist.', static::class, $method
+                'Method %s::%s does not exist.',
+                static::class,
+                $method
             ));
         }
 
