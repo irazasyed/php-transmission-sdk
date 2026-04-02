@@ -37,7 +37,7 @@ class ExceptionThrower implements Plugin
                         $message = 'Your IP Address is Not Whitelisted';
                         break;
                     default:
-                        $message = is_array($content) ? $content['result'] : $content;
+                        $message = is_array($content) && isset($content['result']) ? $content['result'] : $content;
                         break;
                 }
 
